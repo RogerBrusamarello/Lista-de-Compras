@@ -13,7 +13,7 @@ const appNavigator = createStackNavigator(
       screen: Cadastro,
     },
   },
-  {
+   {
     initialRouteName: 'Login',
     defaultNavigationOptions: {
       header: null
