@@ -5,6 +5,7 @@ import {
   View,
   TextInput,
   TouchableOpacity,
+  ImageBackground,
 } from 'react-native';
 import firebase from 'react-native-firebase';
 import { createStackNavigator, createAppContainer } from "react-navigation";
@@ -17,12 +18,17 @@ export default class App extends Component {
     isAuthenticated: false,
     error: false,
   };
+
   //Variavel de senha e login
   login = async () => {
     const { email, password } = this.state;
 
     //TESTA SE A SENHA TA CERTA
     try {
+      //Verifica se os campos foram preenchidos
+      if (email === '' || password === '') {
+        return this.setState({ error: true })
+      }
       this.setState({ error: false })
       const user = await firebase.auth()
         .signInWithEmailAndPassword(email, password);
@@ -34,33 +40,39 @@ export default class App extends Component {
   // TELA DE LOGIN EM JSX
   render() {
     return (
-      <View style={styles.container}>
-        <TextInput
-          style={styles.input}
-          placeholder="Digite seu e-mail"
-          value={this.state.email}
-          onChangeText={email => this.setState({ email })}
-        />
+      <ImageBackground source={require("../../Images/back.jpg")} style={styles.container} resizeMode='cover'>
+        <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
+          <Text style={styles.title}>Lista de Compras</Text>
 
-        <TextInput
-          style={styles.input}
-          placeholder="Digite sua senha"
-          secureTextEntry={true}
-          value={this.state.password}
-          onChangeText={password => this.setState({ password })}
-        />
-        <View style={styles.buttons}>
-          <TouchableOpacity style={styles.button} onPress={this.login}>
-            <Text style={styles.buttonText}>Entrar</Text>
-          </TouchableOpacity>
+          <View style={styles.container}>
+            <TextInput
+              style={styles.input}
+              placeholder="Digite seu e-mail"
+              value={this.state.email}
+              onChangeText={email => this.setState({ email })}
+            />
 
-          <TouchableOpacity style={styles.button} onPress={() => this.props.navigation.navigate('Cadastro')}>
-            <Text style={styles.buttonText}>Cadastrar</Text>
-          </TouchableOpacity>
-        </View>
-        {this.state.isAuthenticated ? <Text Sytle={styles.logonText}>Logado com Sucesso</Text> : null}
-        {this.state.error && <Text Sytle={styles.logonText}>Senha ou Usuário incorreto</Text>}
-      </View>
+            <TextInput
+              style={styles.input}
+              placeholder="Digite sua senha"
+              secureTextEntry={true}
+              value={this.state.password}
+              onChangeText={password => this.setState({ password })}
+            />
+            <View style={styles.buttons}>
+              <TouchableOpacity style={styles.button} onPress={this.login}>
+                <Text style={styles.buttonText}>Entrar</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.button} onPress={() => this.props.navigation.navigate('Cadastro')}>
+                <Text style={styles.buttonText}>Cadastrar</Text>
+              </TouchableOpacity>
+            </View>
+            {this.state.isAuthenticated ? this.props.navigation.navigate('Home') : null}
+            {this.state.error && <View style={styles.logonView}><Text style={styles.logonText}>Senha ou Usuário incorreto</Text></View>}
+          </View>
+        </KeyboardAvoidingView>
+      </ImageBackground>
     );
   }
 }
@@ -70,8 +82,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#A020F0', // COR FICOU PERFEITO
-    padding: 20,
   },
   input: {
     height: 45,
@@ -87,20 +97,38 @@ const styles = StyleSheet.create({
   },
   button: {
     height: 45,
-    backgroundColor: '#EE82EE',
+    backgroundColor: '#CBCBCB',
     alignSelf: 'stretch',
-    paddingHorizontal: 64,
+    paddingHorizontal: 60,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 10
+    marginBottom: 10,
+    borderRadius: 40,
   },
   buttonText: {
     color: '#FFF',
     fontWeight: 'bold'
   },
-
+  logonView: {
+    height: 45,
+    backgroundColor: '#CBCBCB',
+    alignSelf: 'stretch',
+    paddingHorizontal: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
+    borderRadius: 40,
+  },
   logonText: {
     color: '#FFF',
     fontWeight: 'bold'
+  },
+  title: {
+    fontSize: 35,
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontWeight: 'bold',
+    color: '#FFF'
   }
 });
+
