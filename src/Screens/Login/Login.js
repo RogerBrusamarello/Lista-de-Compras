@@ -5,19 +5,28 @@ import {
   View,
   TextInput,
   TouchableOpacity,
-  ImageBackground,
+  Dimensions,
+  Image,
+  KeyboardAvoidingView
 } from 'react-native';
 import firebase from 'react-native-firebase';
-import { createStackNavigator, createAppContainer } from "react-navigation";
+//import { createStackNavigator, createAppContainer } from "react-navigation";
+
+const { width, height } = Dimensions.get("screen");
 
 
 export default class App extends Component {
-  state = {
+
+  initialState = {
     email: '',
     password: '',
-    isAuthenticated: false,
     error: false,
   };
+
+  state = {
+    ...this.initialState,
+  };
+
 
   //Variavel de senha e login
   login = async () => {
@@ -26,53 +35,59 @@ export default class App extends Component {
     //TESTA SE A SENHA TA CERTA
     try {
       //Verifica se os campos foram preenchidos
-      if (email === '' || password === '') {
+      if (email == '' || password == '') {
         return this.setState({ error: true })
       }
       this.setState({ error: false })
       const user = await firebase.auth()
         .signInWithEmailAndPassword(email, password);
-      this.setState({ isAuthenticated: true });
+      this.props.navigation.navigate('Home')
     } catch (err) {
       this.setState({ error: true })
     }
   }
+
+  goToRegister = () => {
+    this.setState({ ...this.initialState });
+    this.props.navigation.navigate('Cadastro');
+  }
   // TELA DE LOGIN EM JSX
   render() {
     return (
-      <ImageBackground source={require("../../Images/back.jpg")} style={styles.container} resizeMode='cover'>
-        <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
-          <Text style={styles.title}>Lista de Compras</Text>
 
-          <View style={styles.container}>
-            <TextInput
-              style={styles.input}
-              placeholder="Digite seu e-mail"
-              value={this.state.email}
-              onChangeText={email => this.setState({ email })}
-            />
+      <View style={styles.container}>
+        <Image source={require("../../Images/back.jpg")} style={styles.Image} resizeMode='cover' />
 
-            <TextInput
-              style={styles.input}
-              placeholder="Digite sua senha"
-              secureTextEntry={true}
-              value={this.state.password}
-              onChangeText={password => this.setState({ password })}
-            />
-            <View style={styles.buttons}>
-              <TouchableOpacity style={styles.button} onPress={this.login}>
-                <Text style={styles.buttonText}>Entrar</Text>
-              </TouchableOpacity>
+        <Text style={styles.title}>Lista de Compras</Text>
+        <View style={styles.container}>
+          <TextInput
+            style={styles.input}
+            placeholder="Digite seu e-mail"
+            value={this.state.email}
+            onChangeText={email => this.setState({ email })}
+          />
 
-              <TouchableOpacity style={styles.button} onPress={() => this.props.navigation.navigate('Cadastro')}>
-                <Text style={styles.buttonText}>Cadastrar</Text>
-              </TouchableOpacity>
-            </View>
-            {this.state.isAuthenticated ? this.props.navigation.navigate('Home') : null}
-            {this.state.error && <View style={styles.logonView}><Text style={styles.logonText}>Senha ou Usuário incorreto</Text></View>}
+          <TextInput
+            style={styles.input}
+            placeholder="Digite sua senha"
+            secureTextEntry={true}
+            value={this.state.password}
+            onChangeText={password => this.setState({ password })}
+          />
+          <View style={styles.buttons}>
+            <TouchableOpacity style={styles.button} onPress={this.login}>
+              <Text style={styles.buttonText}>Entrar</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.button} onPress={() => this.goToRegister()}>
+              <Text style={styles.buttonText}>Cadastrar</Text>
+            </TouchableOpacity>
           </View>
-        </KeyboardAvoidingView>
-      </ImageBackground>
+          {this.state.error && <View style={styles.logonView}><Text style={styles.logonText}>Senha ou Usuário incorreto</Text></View>}
+
+        </View>
+      </View>
+
     );
   }
 }
@@ -82,6 +97,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  Image: {
+    width,
+    height,
+    top: 0,
+    left: 0,
+    position: 'absolute',
   },
   input: {
     height: 45,
@@ -124,11 +146,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   title: {
-    fontSize: 35,
+    fontSize: 30,
     alignItems: 'center',
     justifyContent: 'center',
     fontWeight: 'bold',
     color: '#FFF'
   }
 });
-

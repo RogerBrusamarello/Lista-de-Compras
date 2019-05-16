@@ -7,8 +7,12 @@ import {
     TouchableOpacity,
     ImageBackground,
     KeyboardAvoidingView,
+    Dimensions,
+    Image
 } from 'react-native';
 import firebase from 'react-native-firebase';
+
+const { width, height } = Dimensions.get("screen");
 
 export default class App extends Component {
     state = {
@@ -17,6 +21,7 @@ export default class App extends Component {
         password1: '',
         password2: '',
         error: false,
+        e: false,
     };
     //Variavel de senha e login
     login = async () => {
@@ -29,12 +34,18 @@ export default class App extends Component {
                 return this.setState({ error: true })
             }
             //Verifica se os campos estão vazios
-            else if (email === '' || password1 === '' || password2 === '') {
+            else if (email == '' || password1 == '' || password2 == '') {
                 return this.setState({ error: true })
             }
             this.setState({ error: false })
-            const user = await firebase.auth().createUserWithEmailAndPassword(email, password1);
-            this.props.navigation.goBack();
+            //Verifica se o email ja não está sendo usado
+            try {
+                const user = firebase.auth().createUserWithEmailAndPassword(email, password);
+                this.setState({ e: false })
+                this.props.navigation.goBack();
+            } catch (e) {
+                this.setState({ e: true })
+            }
         } catch (err) {
             this.setState({ error: true })
         }
@@ -42,9 +53,9 @@ export default class App extends Component {
     //Tela de Cadastro em JSX
     render() {
         return (
-
-            <ImageBackground source={require("../../Images/back.jpg")} style={styles.container} resizeMode='cover'>
-                <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
+            <View style={styles.container}>
+                <Image source={require("../../Images/back.jpg")} style={styles.Image} resizeMode='cover' />
+                <View style={styles.container}>
                     <Text style={styles.title}>Cadastro</Text>
 
                     <View style={styles.container}>
@@ -82,12 +93,15 @@ export default class App extends Component {
                         </View>
                         {this.state.error &&
                             <View style={styles.logonView}>
-                                <Text style={styles.logonText}>Verifique os Campos, se todos estão corretamente digitados.</Text>
+                                <Text style={styles.logonText}>Verifique os campos, se todos estão corretamente digitados.</Text>
+                            </View>}
+                        {this.state.e &&
+                            <View style={styles.logonView}>
+                                <Text style={styles.logonText}>E-mail já está sendo utilizado.</Text>
                             </View>}
                     </View>
-                </KeyboardAvoidingView>
-            </ImageBackground>
-
+                </View>
+            </View>
         );
     }
 }
@@ -98,6 +112,13 @@ const styles = StyleSheet.create({
         paddingHorizontal: 30,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    Image: {
+        width,
+        height,
+        top: 0,
+        left: 0,
+        position: 'absolute',
     },
     input: {
         height: 40,

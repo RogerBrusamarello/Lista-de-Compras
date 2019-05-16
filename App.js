@@ -5,7 +5,7 @@ import Routes from './src/Routes';
 export default function app(){
     return (
       <Fragment>
-        <StatusBar barStyle="light-content" backgroundColor="#000000" />
+        <StatusBar barStyle="light-content" backgroundColor='black' />
         <Routes />
       </Fragment>
     );
